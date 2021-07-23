@@ -1,0 +1,181 @@
+<html>
+
+<head>
+</head>
+
+<body>
+    <button id="switch">Switch</button>
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+        import { fluid } from "./water.js";
+        import { crate } from "./crate.js";
+        import { raycast } from "./raycast.js";
+        var can, scene, renderer, camera, fluidModel, landModel, waterMesh, landMesh, player, input, light, raycaster, physObs, virtualmouse;
+        var lightambient;
+        const loader = new THREE.TextureLoader();
+
+        var resolution = 128,
+            landRes = 256,
+            pokeSize = 50,
+            lightRad = 3;
+
+        window.onload = init;
+        // window.onmouseup = () => {
+        //     fluidModel.poke(100, 100, Math.PI / 4);
+        // }
+
+        class boat {
+            constructor() {
+                var geo = new THREE.BoxBufferGeometry(.025, .025, .025);
+                var mat = new THREE.MeshPhongMaterial({});
+                this.mesh = new THREE.Mesh(geo, mat);
+                this.mesh.receiveShadow = true;
+                this.mesh.castShadow = true;
+                // this.mesh.visible = false;
+                scene.add(this.mesh);
+
+                this.speed = .01;
+                this.direction = 0;
+                this.position = new THREE.Vector3();
+            }
+            rotate(rad) {
+                this.direction += rad;
+                this.direction +=
+                    (this.direction > Math.PI * 2) ? -Math.PI * 2 :
+                        (this.direction < 0) ? Math.PI * 2 :
+                            0;
+                this.mesh.rotation.y = this.direction;
+            }
+            move(dir) {
+                var movement = new THREE.Vector3(Math.sin(this.direction), 0, Math.cos(this.direction)).multiplyScalar(this.speed * dir);
+                this.position.add(movement);
+                this.mesh.position.copy(this.position);
+            }
+        }
+
+        function init() {
+            physObs = [];
+            virtualmouse = {pos:new THREE.Vector3(0,0,0)};
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMapType = THREE.PCFSoftShadowMap;
+
+            document.body.appendChild(renderer.domElement);
+            scene = new THREE.Scene();
+            can = renderer.domElement;
+
+            const fov = 75;
+            const aspect = window.innerWidth / window.innerHeight;
+            const near = 0.1;
+            const far = 5;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.set(0, 2 / 4, 3 / 4);
+            camera.lookAt(0, 0, 0);
+
+            waterMesh = new THREE.PlaneBufferGeometry(1, 1, resolution - 1, resolution - 1);
+            var mat = new THREE.MeshPhysicalMaterial({
+                opacity: .8,
+                color: 0xCCCCCC,
+                reflectivity: 1,
+                //flatShading: true,
+                roughness: 0
+            });
+            //var mat = new THREE.ShaderMaterial(waterShader);
+             mat.transparent = true;
+            waterMesh = new THREE.Mesh(waterMesh, mat, resolution, resolution);
+            waterMesh.layers.enable(1);
+            waterMesh.rotation.x = - Math.PI / 2;
+            waterMesh.castShadow = true;
+            waterMesh.receiveShadow = true;
+            scene.add(waterMesh);
+
+            light = new THREE.DirectionalLight(0xffffff, 1.5);
+            light.castShadow = true;
+            light.shadow.mapSize.width = 2048;
+            light.shadow.mapSize.height = 2048;
+            scene.add(light);
+            scene.add(light.target);
+
+            const color = 0xFFFFFF;
+            const intensity = 1;
+            lightambient = new THREE.AmbientLight(color, intensity);
+            scene.add(lightambient);
+
+            fluidModel = new fluid(resolution, resolution, .5, .3, 1, .05, waterMesh);
+
+            // var d=Math.PI/4;
+            // setInterval(() => { 
+            //     for(var i=0; i<1; i++){
+            //         fluidModel.poke(
+            //             100,100,d
+            //         );
+            //     }
+            //     d+=.05;
+
+            raycaster = new raycast(can, scene, fluidModel, physObs, camera, virtualmouse);
+
+            window.onmousedown = (e) => {raycaster.mousedown(e);};
+            window.onmouseup = (e) => {raycaster.mouseup(e);};
+            window.onmousemove = (e) => {raycaster.mousemove(e);};
+            // }, 500);
+
+            for(var i=0; i<10; i++){
+                new crate(Math.random()-.5,Math.random()-.5,.05*Math.random()+.05,physObs,scene,virtualmouse, fluidModel);
+            }
+
+            setInterval(main, 10);
+
+            window.requestAnimationFrame(render);
+        };
+
+        var timer = 0;
+        function main() {
+            timer++;
+
+            light.target.position.set(Math.sin(timer / 100), -.3, Math.cos(timer / 100)).multiplyScalar(lightRad);
+
+            physObs.forEach(b=>{
+                b.update();
+                if(b.hitwater){
+                    fluidModel.lock(
+                        Math.floor(b.pos.x * resolution + resolution / 2),
+                        Math.floor(b.pos.z * resolution + resolution / 2),
+                        .2,
+                        fluidModel.infoAtPos(b.pos.x, b.pos.z).pos - b.vel.y*1.5  ,
+                        0
+                    );
+                }
+            });
+            fluidModel.unlock();
+            fluidModel.evaluate();
+        }
+
+        function render(t) {
+            renderer.render(scene, camera);
+            fluidModel.updateMesh();
+            window.requestAnimationFrame(render);
+        }
+
+        document.getElementById("switch").addEventListener("click", ()=>{
+            waterMesh.material.needsUpdate = true
+            if(waterMesh.material.flatShading){
+                waterMesh.material.flatShading = false;
+                waterMesh.material.transparent = true;
+                lightambient.intensity = 1;
+                return;
+            }
+            waterMesh.material.transparent = false;
+            waterMesh.material.flatShading = true;
+            lightambient.intensity = 0;
+            console.log("true");
+        });
+
+        Number.prototype.clamp = function (min, max) {
+            return Math.min(Math.max(this, min), max);
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+<html>
+
+<head>
+</head>
+
+<body>
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+        var can, renderer, scene, camera, mouse;
+        var loader = new THREE.FileLoader();
+        var tloader = new THREE.TextureLoader();
+
+        var metaballShader = {
+            uniforms: {
+                time: { value: 0 },
+                progress: { value: 0 },
+                resolution: { value: new THREE.Vector4() },
+                positions: { value: new THREE.Vector3() },
+                matrix: {value: new THREE.Matrix4() },
+                uMatcap: {value: tloader.load("matcap.jpg") },
+            },
+            vertexShader:
+                `varying vec2 vUv;
+                    varying vec4 pos;
+                    void main() {
+                        vUv = uv;
+                        pos = vec4( position, 1.0 );
+                        gl_Position = pos;
+                    }`,
+            fragmentShader: ``
+        };
+        loader.load('fragment.glsl', (data) => { metaballShader.fragmentShader = data; init(); });
+
+        window.onmousemove = mousemove;
+
+        var mousedown = false;
+        window.onmousedown = (event)=>{
+            mouse.set(event.clientX, event.clientY)
+            mousedown = true;
+        }
+        window.onmouseup = ()=>{
+            mousedown = false;
+        }
+
+        var intersects;
+        function mousemove(event) {
+            if(mousedown){
+                var rotation = new THREE.Euler((event.clientY - mouse.y)/400, (event.clientX - mouse.x)/400, 0);
+                mouse.set(event.clientX, event.clientY);
+                metaballShader.uniforms.matrix.value.multiply(new THREE.Matrix4().makeRotationFromEuler(rotation));
+            }
+        }
+
+        function init() {
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            metaballShader.uniforms.resolution.value.set(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight, 1);
+           
+            document.body.appendChild(renderer.domElement);
+            scene = new THREE.Scene();
+            can = renderer.domElement;
+
+            mouse = new THREE.Vector2();
+
+            const fov = 75;
+            const aspect = window.innerWidth / window.innerHeight;
+            const near = 0.1;
+            const far = 5;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.set(.5, .5, 2);
+            camera.lookAt(0, 0, 0);
+
+            const geometry = new THREE.PlaneGeometry(2, 2);
+            const material2 = new THREE.ShaderMaterial(metaballShader);
+            const plane = new THREE.Mesh(geometry, material2);
+            scene.add(plane);
+
+            var i=0;
+            window.setInterval(()=>{
+                i+=.01;
+                if(i>=2){
+                    i=0;
+                }
+                metaballShader.uniforms.positions.value.set(Math.sin(i*Math.PI)*1.1,0,0);
+            }, 10);
+
+            generate();
+
+            render();
+        };
+
+        function generate() {
+            var width = 3;
+            var rad = 1 / 30;
+            var sphere = new THREE.SphereBufferGeometry(rad, 10, 10);
+            var mat = new THREE.ShaderMaterial(metaballShader);
+        }
+
+        function render() {
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <link rel="preload" href="OtomanopeeOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
+        <style>
+            body{
+                background-color:rgb(17, 17, 17);
+            }
+            .cont{
+                display: grid;
+                grid-template-columns: 70% 30%;
+                position: absolute;
+                top:0px;
+                left:0px;
+                height:100%;
+                width:100%;
+            }
+            .tex{
+                display:flex;
+                flex-direction:column;
+            }
+            @font-face {
+                font-family: 'Otomanopee One';
+                src: url('OtomanopeeOne-Regular.woff2') format('woff2'),
+                    url('OtomanopeeOne-Regular.woff') format('woff');
+                font-weight: normal;
+                font-style: normal;
+                font-display: swap;
+            }
+            .area{
+                height:50%;
+                color:rgb(235, 233, 233);
+                font-family: 'Otomanopee One';
+                font-weight: normal;
+                font-style: normal;
+            }
+            h1{
+                margin-left:-200px;
+                font-size: 60;
+            }
+            p{
+                padding-right:30px;
+                font-family: 'Arial';
+            }
+
+            a.button1{
+                display:inline-block;
+                padding:0.35em 1.2em;
+                border:0.1em solid #FFFFFF;
+                margin:0 0.3em 0.3em 0;
+                border-radius:0.12em;
+                box-sizing: border-box;
+                text-decoration:none;
+                font-family:'Roboto',sans-serif;
+                font-weight:300;
+                color:#FFFFFF;
+                text-align:center;
+                transition: all 0.2s;
+            }
+
+            a.button1:hover{
+                color:#000000;
+                background-color:#FFFFFF;
+            }
+
+            @media all and (max-width:30em){
+                a.button1{
+                    display:block;
+                    margin:0.4em auto;
+                }
+            } 
+            .firstLine{
+                margin-left:-50px;
+            }
+        </style>
+    </head>
+<body>
+<div class="cont">
+    <div>
+        <div id="marching"></div>
+        <div id="water"></div>
+    </div>
+    <div class="tex">
+        <div class="area" style="margin-left:-100px;">
+            <h1>Ray Marching</h1>
+            <p class="firstLine">An example of Ray Marching along with rendering with a MatCap.</p>
+            <p>Move your mouse over it and give it a whirl!</p>
+        </div>
+        <div class="area">
+            <h1>Liquid Simulation</h1>
+            <p class="firstLine">Water simulated in real time, which boxes that react naturally.</p>
+            <p>You can also pick up the boxes by clicking on them.</p>
+            <p>Make waves with your mouse cursor.</p>
+            <a id="switch" class="button1">press this to more easily see the simulation</a>
+    </div>
+</div>
+<script type="module" src="marching/marchingwater.js"></script>
+<script type="module" src="water/water-with-boxes.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<html>
+<body>
+    <canvas id="canvas" width="500" height="300"></canvas>
+    <div id="ou" style="width:805; word-wrap:anywhere;"></div>
+    <script type="module">
+
+        // Find the latest version by visiting https://unpkg.com/three. The URL will
+        // redirect to the newest stable release.
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
+        var can, cube, renderer, scene, camera, line, mouse, raycaster, points, refgeo, wavearr, physObs, selected;
+        
+        
+
+        function main() {
+            can = document.querySelector('#canvas');
+            renderer = new THREE.WebGLRenderer({canvas});
+            renderer.shadowMap.enabled = true;
+
+            mouse = new THREE.Vector2();
+            
+            
+
+            wavearr = [];
+
+            const fov = 75;
+            const aspect = can.width/can.height;
+            const near = 0.1;
+            const far = 5;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.z = 1;
+
+            scene = new THREE.Scene();
+
+            const ypos = -3;
+            const boxWidth = 3;
+            const boxHeight = 3;
+            const boxDepth = 3;
+            const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth, width, 1, height);
+            refgeo = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth, width, 1, height);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x0000CC, 
+                shininess: 150,
+                flatShading: true
+            });
+            cube = new THREE.Mesh(geometry, material);
+            cube.receiveShadow = true;
+            cube.position.y = ypos;
+
+            scene.add(cube);
+            camera.lookAt(0,ypos,0);
+
+            var pointmat = new THREE.PointsMaterial({
+                size: 0,
+                opacity: 0
+            });
+            pointmat.transparent = true;
+            points = new THREE.Points(geometry, pointmat);
+            points.position.y = ypos;
+            points.layers.enable(1);
+            scene.add(points);
+
+            const color = 0xFFFFFF;
+            const intensity = 1;
+            const light = new THREE.DirectionalLight(color, intensity);
+            light.castShadow = true;
+            light.position.set(-1, 3, 2);
+            scene.add(light);
+
+            physObs = [];
+            for(var i=0; i<10; i++){
+                var newCube = new crate(Math.random()*3-1.5, Math.random()*3-1.5);
+            }
+            
+            requestAnimationFrame(render);
+            //setInterval(update, 10);
+        }
+        main();
+
+        function update(){
+            wavearr.forEach((w, i)=>{
+                if(!w.update()){
+                    wavearr.splice(i, 1);
+                }/*else{
+                    document.getElementById("ou").innerHTML += "";
+                    for(var x = 0; x < width; x++){
+                        for(var y = 0; y < height; y++){
+                            document.getElementById("ou").innerHTML += w.getVal(x,y);
+                        }
+                    }
+                }*/
+            });
+
+            var vertArr = cube.geometry.attributes.position.array;
+            for(var i = 0; i < vertArr.length; i+=3){
+                if(refgeo.attributes.position.array[i+1] < -1){
+                    continue;                                                   //don't update vertex below the surface
+                }
+                var [x, y, z] = [vertArr[i], vertArr[i+1], vertArr[i+2]];
+                vertArr[i+1] = refgeo.attributes.position.array[i+1];
+
+                wavearr.forEach((w)=>{
+                    
+                    vertArr[i+1] += w.getVal(...approxArrayLoc(x, z)) * w.strength / 100;
+                });
+            }
+            cube.geometry.attributes.position.needsUpdate = true;
+
+            physObs.forEach(o=>o.update());
+        }
+
+        function render(time){
+            update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        }
+
+        function smoothInterp(a, b, p){
+            return (a * Math.cos(Math.PI/2 * p)) + (b * Math.cos(Math.PI/2 * (1-p)));
+        }
+    </script>
+</body>
+</html>
