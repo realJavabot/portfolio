@@ -39,8 +39,8 @@ function mousemove(event) {
 
 function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth*.5, window.innerHeight*.5);
-    metaballShader.uniforms.resolution.value.set(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight, 1);
+    renderer.setSize(window.innerWidth, window.innerHeight*.5);
+    metaballShader.uniforms.resolution.value.set(window.innerWidth, window.innerHeight, window.innerWidth*2 / window.innerHeight, 1);
     
     document.getElementById("marching").appendChild(renderer.domElement);
     scene = new THREE.Scene();
@@ -104,6 +104,6 @@ function onWindowResize(){
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth/2, window.innerHeight/2 );
-    metaballShader.uniforms.resolution.value.set(window.innerWidth, window.innerHeight, window.innerWidth / window.innerHeight, 1);
+    renderer.setSize( window.innerWidth, window.innerHeight/2 );
+    metaballShader.uniforms.resolution.value.set(window.innerWidth, window.innerHeight, window.innerWidth*2 / window.innerHeight, 1);
 }

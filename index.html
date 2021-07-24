@@ -6,13 +6,10 @@
                 background-color:rgb(17, 17, 17);
             }
             .cont{
-                display: grid;
-                grid-template-columns: 70% 30%;
+                display: flex;
                 position: absolute;
                 top:0px;
                 left:0px;
-                height:100%;
-                width:100%;
             }
             .tex{
                 display:flex;
@@ -27,14 +24,12 @@
                 font-display: swap;
             }
             .area{
-                height:50%;
                 color:rgb(235, 233, 233);
                 font-family: 'Otomanopee One';
                 font-weight: normal;
                 font-style: normal;
             }
             h1{
-                margin-left:-200px;
                 font-size: 60;
             }
             p{
@@ -69,31 +64,31 @@
                 }
             } 
             .firstLine{
-                margin-left:-50px;
             }
         </style>
     </head>
 <body>
 <div class="cont">
+    <center>
     <div>
-        <div id="marching"></div>
-        <div id="water"></div>
-    </div>
-    <div class="tex">
-        <div class="area" style="margin-left:-100px;">
-            <h1>Ray Marching</h1>
-            <p class="firstLine">An example of Ray Marching along with rendering with a MatCap.</p>
-            <p>Move your mouse over it and give it a whirl!</p>
+        <div id="marching">
+            <div class="area">
+                <h1>Ray Marching</h1>
+                <p class="firstLine">An example of Ray Marching along with rendering with a MatCap.</p>
+                <p>Move your mouse over it and give it a whirl!</p>
+            </div>
         </div>
-        <div class="area">
+        <div id="water">
+            <div class="area">
             <h1>Liquid Simulation</h1>
             <p class="firstLine">Water simulated in real time, which boxes that react naturally.</p>
             <p>You can also pick up the boxes by clicking on them.</p>
             <p>Make waves with your mouse cursor.</p>
             <a id="switch" class="button1">press this to more easily see the simulation</a>
-            <p style="margin-top:40px;">Both of these demos were made with THREE.js and GLSL</p>
-            <p style="margin-top:50px; color:beige;">Michael Tchistopolskii - michaeltchistopolskii@gmail.com</p>
+            <p>Both of these demos were made with THREE.js and GLSL</p>
+            <p>Michael Tchistopolskii - michaeltchistopolskii@gmail.com</p>
     </div>
+    </center>
 </div>
 <script type="module" src="marching/marchingwater.js"></script>
 <script type="module" src="water/water-with-boxes.js"></script>

@@ -50,7 +50,7 @@ function init() {
     virtualmouse = {pos:new THREE.Vector3(0,0,0)};
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth*.5, window.innerHeight*.5);
+    renderer.setSize( window.innerWidth, window.innerHeight/2 );
     renderer.setClearColor(new THREE.Color("rgb(17, 17, 17)"), 1);
     renderer.shadowMap.enabled = true;
     renderer.shadowMapType = THREE.PCFSoftShadowMap;
@@ -60,7 +60,7 @@ function init() {
     can = renderer.domElement;
 
     const fov = 75;
-    const aspect = window.innerWidth / window.innerHeight;
+    const aspect = window.innerWidth*2 / window.innerHeight;
     const near = 0.1;
     const far = 5;
     camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -175,9 +175,9 @@ window.addEventListener( 'resize', onWindowResize, false );
 
 function onWindowResize(){
 
-    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.aspect = window.innerWidth*2 / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth/2, window.innerHeight/2 );
+    renderer.setSize( window.innerWidth, window.innerHeight/2 );
 
 }

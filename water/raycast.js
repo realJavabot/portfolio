@@ -67,6 +67,6 @@ export class raycast{
 
     getMouse(event){
         this.mouse.x = ((event.clientX-this.can.offsetLeft) / this.can.width) * 2 - 1;
-        this.mouse.y = -((event.clientY-this.can.offsetTop) / this.can.height) * 2 + 1;
+        this.mouse.y = -((event.clientY-this.can.offsetTop + window.scrollY) / this.can.height) * 2 + 1;
     }
 }
