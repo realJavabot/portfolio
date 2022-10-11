@@ -56,7 +56,7 @@ export class crate{
             }
             this.pos.add(this.vel);
             normal.normalize().multiplyScalar(Math.PI*2);
-            var tempvec = this.mesh.rotation.toVector3().add(normal);
+            var tempvec = Vector3.setFromEuler(this.mesh.rotation).add(normal);
             this.mesh.rotation.setFromVector3(tempvec.lerp(new THREE.Vector3(0,tempvec.y,0),0.1));
         }
         this.mesh.position.copy(this.pos);  
