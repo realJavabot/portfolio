@@ -1,5 +1,5 @@
 
-import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+import * as THREE from '/three.module.js';
 
 export class crate{
     constructor(x, z, d = 0.2, physObs, scene, virtualmouse, waterob){
@@ -56,7 +56,7 @@ export class crate{
             }
             this.pos.add(this.vel);
             normal.normalize().multiplyScalar(Math.PI*2);
-            var tempvec = Vector3.setFromEuler(this.mesh.rotation).add(normal);
+            var tempvec = new THREE.Vector3().setFromEuler(this.mesh.rotation).add(normal);
             this.mesh.rotation.setFromVector3(tempvec.lerp(new THREE.Vector3(0,tempvec.y,0),0.1));
         }
         this.mesh.position.copy(this.pos);  

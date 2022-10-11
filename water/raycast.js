@@ -1,5 +1,5 @@
 
-import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+import * as THREE from '/three.module.js';
 
 export class raycast{
     constructor(can, scene, waterob, physObs, camera, virtualmouse){
