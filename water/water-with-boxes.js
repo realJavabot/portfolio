@@ -1,4 +1,4 @@
-import * as THREE from 'portfolio/js/three.module.js';
+import * as THREE from '/portfolio/js/three.module.js';
 import { fluid } from "./water.js";
 import { crate } from "./crate.js";
 import { raycast } from "./raycast.js";

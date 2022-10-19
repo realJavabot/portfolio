@@ -1,4 +1,4 @@
-import * as THREE from 'portfolio/js/three.module.js';
+import * as THREE from '/portfolio/js/three.module.js';
 var can, renderer, scene, camera, mouse;
 var loader = new THREE.FileLoader();
 var tloader = new THREE.TextureLoader();

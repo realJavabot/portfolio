@@ -1,5 +1,5 @@
 
-import * as THREE from 'portfolio/js/three.module.js';
+import * as THREE from '/portfolio/js/three.module.js';
 
 export class crate{
     constructor(x, z, d = 0.2, physObs, scene, virtualmouse, waterob){
